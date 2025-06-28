@@ -1,6 +1,9 @@
 # Pypp
 Python superset **in work**
 
+# IMPORTANT
+if planning to use and not building the project from source, go to any release in the release page and download any stable release _marked by (stable)_ and put in in the folder where your .pypp file lives and run to compile the file, rest are down below
+
 # Intro
  - adds datatypes
  - adds semicolon
