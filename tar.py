@@ -8,14 +8,11 @@ class TypedValue:
             if self.expected_type == 'var' or self.expected_type == 'const':
                 pass
             else:
-                print('ERROR: Wrong DataType error!')
+                print(f'ERROR: Wrong DataType error for value: {self.value} and type: {self.expected_type}')
                 exit()
 
-PI = TypedValue(3.14, 'const')
-print(PI.value)
-#*str PI = "Nope"
-age = TypedValue(5, int)
-age.checkTE()
-print(age.value)
-print(age.value)
-print("Hello?")
+PI = TypedValue(3.141592, 'const')
+radius = TypedValue(10, int)
+radius.checkTE()
+if PI.value > 1 :
+    print("Yes")

@@ -21,7 +21,7 @@ with open(file_name[1].strip(), "w") as destfile:
         "            if self.expected_type == 'var' or self.expected_type == 'const':",
         "                pass",
         "            else:",
-        "                print('ERROR: Wrong DataType error!')",
+        "                print(f'ERROR: Wrong DataType error for value: {self.value} and type: {self.expected_type}')",
         "                exit()",
         ""
     ]
@@ -32,7 +32,7 @@ with open(file_name[1].strip(), "w") as destfile:
         destfile.write(line + "\n")
 
     for line in tarfile:
-        line = line.strip()
+        line = line.rstrip()
         if not line:
             continue
 
@@ -79,5 +79,11 @@ with open(file_name[1].strip(), "w") as destfile:
                 varandtypes[const_name] = "const"
                 destfile.write(f"{const_name} = TypedValue({const_value}, 'const')\n")
 
+        elif line.rstrip().endswith("{"):
+            line = line.replace("{", ":")
+            destfile.write(line + "\n")
+        elif line == "}":
+            continue
+        
         else:
             destfile.write(line + "\n")
