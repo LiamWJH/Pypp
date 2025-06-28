@@ -4,23 +4,18 @@ class TypedValue:
         self.expected_type = expected_type
 
     def checkTE(self):
-
-
         if not isinstance(self.value, self.expected_type):
-            if self.expected_type == 'var':
-                 pass
+            if self.expected_type == 'var' or self.expected_type == 'const':
+                pass
             else:
-                 print('ERROR: Wrong DataType error!')
-                 exit()
+                print('ERROR: Wrong DataType error!')
+                exit()
 
-
-x = TypedValue(12345, int)
-x.checkTE()
-print(x.value)
-name = TypedValue(input("Hello whats your name?"), str)
-name.checkTE()
-print(f"Hello{name.expected_type}!")
-name = TypedValue("hi", str)
-name.checkTE()
-print(name.value)
-input("")
+PI = TypedValue(3.14, 'const')
+print(PI.value)
+#*str PI = "Nope"
+age = TypedValue(5, int)
+age.checkTE()
+print(age.value)
+print(age.value)
+print("Hello?")

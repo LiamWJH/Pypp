@@ -1,33 +1,15 @@
-import subprocess, sys
-import ast
-
-def installpkg(packagename):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", packagename])
-
-try:
-    import pyinstaller
-except ImportError as IE:
-    installpkg("pyinstaller")
-
-   
+import sys
 
 file_name = input("pypp>>>")
-#input style is like pypp_filename -o py_filename
 file_name = file_name.split("-o")
 
 with open(file_name[0].strip(), "r") as f:
     tarfile = f.read()
 
-
-
-
-#main cause im too lazy
 with open(file_name[1].strip(), "w") as destfile:
     print("Convert Init\n\n\n\n\n\n\n\n")
-    exetarfile = tarfile
     tarfile = tarfile.splitlines()
 
-    #class for variables and types
     typedvalue_code = [
         "class TypedValue:",
         "    def __init__(self, value, expected_type):",
@@ -35,45 +17,67 @@ with open(file_name[1].strip(), "w") as destfile:
         "        self.expected_type = expected_type",
         "",
         "    def checkTE(self):",
-        "",
-        "",
         "        if not isinstance(self.value, self.expected_type):",
-        "            if self.expected_type == 'var':",
-        "                 pass",
+        "            if self.expected_type == 'var' or self.expected_type == 'const':",
+        "                pass",
         "            else:",
-        "                 print('ERROR: Wrong DataType error!')",
-        "                 exit()",
-        "",
+        "                print('ERROR: Wrong DataType error!')",
+        "                exit()",
         ""
     ]
+
+    varandtypes = {}
 
     for line in typedvalue_code:
         destfile.write(line + "\n")
 
-    #doing line by line
     for line in tarfile:
-        if line:            
-            if line[-1] == ";":
-                line = line.strip(";")
-
-            if line[0] == "*":
-                line = line[1:].strip()
-                parts = line.split("=", 1)
-
-                left = parts[0].strip()
-                right = parts[1].strip()
-
-                typename, varname = left.split()
-                if typename == "var":
-                    destfile.write(f"{varname} = TypedValue({right}, '{typename}')\n")
-
-                else:
-                    destfile.write(f"{varname} = TypedValue({right}, {typename})\n")
-                    destfile.write(f"{varname}.checkTE()\n")
-
-            else:
-                destfile.write(f"{line}\n")
-
-        
-        else:
+        line = line.strip()
+        if not line:
             continue
+
+        if line.endswith(";"):
+            line = line.rstrip(";")
+
+        if line.startswith("*"):
+            line = line[1:].strip()
+            parts = line.split("=", 1)
+
+            if len(parts) != 2:
+                continue
+
+            left = parts[0].strip()
+            right = parts[1].strip()
+            typename, varname = left.split()
+
+            if varname in varandtypes:
+                prev_type = varandtypes[varname]
+                if prev_type != typename:
+                    print(f"ERROR: Variable '{varname}' already declared as '{prev_type}', not '{typename}'")
+                    exit()
+                if prev_type == "const":
+                    continue  # skip redefining const
+
+            varandtypes[varname] = typename
+
+            if typename == "var":
+                destfile.write(f"{varname} = TypedValue({right}, '{typename}')\n")
+            else:
+                destfile.write(f"{varname} = TypedValue({right}, {typename})\n")
+                destfile.write(f"{varname}.checkTE()\n")
+
+        elif line.startswith("#define"):
+            parts = line.split()
+            if len(parts) >= 3:
+                const_name = parts[1]
+                const_value = parts[2]
+
+                if const_name in varandtypes:
+                    print(f"ERROR: Constant '{const_name}' already defined.")
+                    exit()
+
+                varandtypes[const_name] = "const"
+                destfile.write(f"{const_name} = TypedValue({const_value}, 'const')\n")
+
+        else:
+            destfile.write(line + "\n")
