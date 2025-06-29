@@ -3,6 +3,10 @@ class TypedValue:
         self.value = value
         self.expected_type = expected_type
 
+    def changeVAL(self, changeval):
+        self.value = changeval
+
+
     def checkTE(self):
         if not isinstance(self.value, self.expected_type):
             if self.expected_type == 'var' or self.expected_type == 'const':
@@ -14,5 +18,3 @@ class TypedValue:
 PI = TypedValue(3.141592, 'const')
 radius = TypedValue(10, int)
 radius.checkTE()
-if PI.value > 1 :
-    print("Yes")

@@ -1,8 +1,0 @@
-#define PI 3.141592
-
-*int radius = 10;
-
-if PI.value > 1 {
-    print("Yes");
-}
-    

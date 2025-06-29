@@ -1,4 +1,27 @@
 import sys
+import ast
+
+def is_variable_assignment(user_input):
+    try:
+        tree = ast.parse(user_input)
+        return (
+            len(tree.body) == 1 and
+            isinstance(tree.body[0], ast.Assign)
+        )
+    except SyntaxError:
+        return False
+
+def get_var_name(code):
+    tree = ast.parse(code)
+    assign = tree.body[0]
+    if isinstance(assign, ast.Assign):
+        return assign.targets[0].id
+
+def get_var_value_raw(code):
+    local_vars = {}
+    exec(code, {}, local_vars)
+    return list(local_vars.values())[0]
+
 
 file_name = input("pypp>>>")
 file_name = file_name.split("-o")
@@ -15,6 +38,10 @@ with open(file_name[1].strip(), "w") as destfile:
         "    def __init__(self, value, expected_type):",
         "        self.value = value",
         "        self.expected_type = expected_type",
+        "",
+        "    def changeVAL(self, changeval):",
+        "        self.value = changeval",
+        "",
         "",
         "    def checkTE(self):",
         "        if not isinstance(self.value, self.expected_type):",
@@ -86,4 +113,18 @@ with open(file_name[1].strip(), "w") as destfile:
             continue
         
         else:
-            destfile.write(line + "\n")
+            
+            
+            
+            if is_variable_assignment(line):
+                try:
+                    varname = get_var_name(line)
+                    value = get_var_value_raw(line)
+                    
+                    destfile.write(f"{varname}.changeVAL({repr(value)})\n")
+                    destfile.write(f"{varname}.checkTE()\n")
+                except Exception as e:
+                    destfile.write(f"# Failed to process line: {line}\n")
+                    destfile.write(line + "\n")
+            else:
+                destfile.write(line + "\n")
